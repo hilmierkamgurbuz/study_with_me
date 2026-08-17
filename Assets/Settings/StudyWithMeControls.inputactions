@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "StudyWithMeControls",
+    "maps": [
+        {
+            "name": "PushToTalk",
+            "id": "afdd63eb-6cec-4756-86db-8c97ce78ca62",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "86aea860-bc21-4f60-95ad-0980346f6321",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8e2feac4-9174-4d20-90d6-809295567902",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

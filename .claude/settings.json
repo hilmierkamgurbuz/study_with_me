@@ -1,0 +1,88 @@
+{
+  "_comment": "unity-dev skill — project hook registration. This file is the PRIMARY and ONLY home of enforcement: settings hooks run in every session and inside subagents, while SKILL.md frontmatter hooks run only when the skill is active (a gap — do not move these there). Verify with /hooks after install; project-settings hooks require accepting the workspace trust dialog once.",
+  "_form": "All hooks use exec form (command + args): the docs recommend it for any hook that references a path placeholder, because there is no shell to re-tokenize a project path containing spaces.",
+  "_no_if_on_the_gate": "The PreToolUse guard deliberately carries no `if` filter. `if` would cut process spawns, but a filter that stops matching — a pattern-semantics change across versions, an unanticipated protected extension — turns the security gate into a silent no-op. The guard is a few milliseconds of bash; the codemap nudge below, where a miss is harmless, is where `if` is used.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/session_context.py", "${CLAUDE_PROJECT_DIR}"],
+            "statusMessage": "unity-dev: reading map health"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/preflight_guard.sh",
+            "args": [],
+            "statusMessage": "unity-dev: preflight gate"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/preflight_guard.sh",
+            "args": [],
+            "statusMessage": "unity-dev: preflight gate"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(**/*.cs)",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/codemap_guard.sh",
+            "args": [],
+            "statusMessage": "unity-dev: codemap line check"
+          },
+          {
+            "type": "command",
+            "if": "Edit(**/*.asmdef)",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/codemap_guard.sh",
+            "args": [],
+            "statusMessage": "unity-dev: codemap line check"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/preflight_approve.sh",
+            "args": [],
+            "statusMessage": "unity-dev: approval token check"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/refresh_maps.py", "${CLAUDE_PROJECT_DIR}"],
+            "statusMessage": "unity-dev: refreshing maps"
+          }
+        ]
+      }
+    ]
+  }
+}

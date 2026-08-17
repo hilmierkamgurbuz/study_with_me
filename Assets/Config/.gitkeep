@@ -1,0 +1,11 @@
+This folder holds GeminiApiConfig.asset, which is gitignored because it
+carries the Gemini API key. Create your own:
+
+    Assets/Config -> right click -> Create -> StudyWithMe -> Gemini API Config
+
+Name it exactly GeminiApiConfig, then fill in apiKey from
+https://aistudio.google.com/apikey and drag the asset onto the
+GeminiLiveVoiceSession component's Config field in Room.unity.
+
+This file exists only so git keeps the folder; Unity ignores dotfiles,
+so it generates no .meta and never enters the asset database.

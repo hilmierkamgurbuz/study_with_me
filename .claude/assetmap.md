@@ -1,0 +1,264 @@
+<!-- stamp: 2026-08-17T13:37Z source-sig:879b1642762e assets:34 prefabs:198 scenes:9 asmdefs:0 -->
+# assetmap — asset inventory (data, prefabs, load surface, assemblies)
+
+Regenerate with `python3 .claude/hooks/build_assetmap.py`. `data-source.md`
+reads the ScriptableObject section before deciding where a value lives;
+the cost model reads the load-surface section before pricing a load.
+
+## Assemblies (.asmdef) — the real compile boundary
+
+- (none)
+
+## ScriptableObject assets
+
+- Assets/Config/GeminiApiConfig.asset | type: GeminiApiConfig | script: Assets/Scripts/Config/GeminiApiConfig.cs
+- Assets/FruitMerge/Data/FaceSet.asset | type: FaceSet | script: Assets/FruitMerge/Scripts/Data/FaceSet.cs
+- Assets/FruitMerge/Data/FruitDatabase.asset | type: FruitDatabase | script: Assets/FruitMerge/Scripts/Data/FruitDatabase.cs
+- Assets/FruitMerge/Data/GameConfig.asset | type: GameConfig | script: Assets/FruitMerge/Scripts/Data/GameConfig.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_00_Cherry.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_01_Blueberry.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_02_Lime.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_03_Grape.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_04_Orange.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_05_GreenApple.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_06_Peach.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_07_Coconut.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_08_Dragonfruit.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_09_Pineapple.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Data/Fruits/Fruit_10_Watermelon.asset | type: FruitDefinition | script: Assets/FruitMerge/Scripts/Data/FruitDefinition.cs
+- Assets/FruitMerge/Fonts/Baloo2/Baloo2-Bold SDF.asset | type: guid:71c1514a | script: ?
+- Assets/FruitMerge/Fonts/Baloo2/Baloo2-ExtraBold SDF.asset | type: guid:71c1514a | script: ?
+- Assets/FruitMerge/Fonts/Baloo2/Baloo2-Medium SDF.asset | type: guid:71c1514a | script: ?
+- Assets/FruitMerge/Fonts/Baloo2/Baloo2-Regular SDF.asset | type: guid:71c1514a | script: ?
+- Assets/FruitMerge/Fonts/Baloo2/Baloo2-SemiBold SDF.asset | type: guid:71c1514a | script: ?
+- Assets/FruitMerge/Fonts/Permanent_Marker/PermanentMarker-Regular SDF.asset | type: guid:71c1514a | script: ?
+- Assets/LowPolyBoy/FreeStylizedBedRoom/DemoScene/Camera Profile.asset | type: guid:d7fd9488 | script: ?
+- Assets/Settings/DefaultVolumeProfile.asset | type: guid:d7fd9488 | script: ?
+- Assets/Settings/Mobile_RPAsset.asset | type: guid:bf2edee5 | script: ?
+- Assets/Settings/Mobile_Renderer.asset | type: guid:de640fe3 | script: ?
+- Assets/Settings/PC_RPAsset.asset | type: guid:bf2edee5 | script: ?
+- Assets/Settings/PC_Renderer.asset | type: guid:de640fe3 | script: ?
+- Assets/Settings/SampleSceneProfile.asset | type: guid:d7fd9488 | script: ?
+- Assets/Settings/UniversalRenderPipelineGlobalSettings.asset | type: guid:2ec995e5 | script: ?
+- Assets/TextMesh Pro/Resources/TMP Settings.asset | type: guid:2705215a | script: ?
+- Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset | type: guid:71c1514a | script: ?
+- Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset | type: guid:71c1514a | script: ?
+- Assets/TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset | type: guid:84a92b25 | script: ?
+- Assets/TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset | type: guid:ab2114bd | script: ?
+
+## Prefabs
+
+- Assets/FruitMerge/Prefabs/ComboPopup.prefab | variant-of: - | scripts: ComboPopupItem
+- Assets/FruitMerge/Prefabs/Fruit.prefab | variant-of: - | scripts: Fruit, FruitFace
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_bag.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_bed.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_book.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_cabinet_01.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_chair.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_computer_keyboard.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_computer_monitor_01.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_computer_monitor_02.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_computer_mouse.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_computer_mousepad.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_console.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_cup.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_curtain.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_desk.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_desk_chair.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_door.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_frame.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_lamp.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_plants_00.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_plants_01.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_plants_02.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_plants_03.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_rug.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_slipper.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_table.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_wall.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_wall_door.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_wall_window.prefab | variant-of: - | scripts: -
+- Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_window.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Armchair_Classic.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Armchair_Classic_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_10.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_4.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_5.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_6.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_7.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_8.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Book_9.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Bookshelf_Tall.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Box_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Box_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Box_Open.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Carpet_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Carpet_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Clock_WallRound.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Coffee_table_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Coffee_table_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Coffee_table_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Coffee_table_4.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Coffee_table_5.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Console_Modern.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/DVD_Player.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/DeskClock_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/DeskClock_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Gamepad_Classic.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Hanger.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Lamp_Tall.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Mirror.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Mug.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Newspaper.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Night_light_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Night_light_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Night_light_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Night_stand_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Night_stand_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Night_stand_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Night_stand_4.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Nightstand_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Nightstand_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Painting_Modern_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Painting_Modern_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Painting_Modern_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Pillow_Square_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Pillow_Square_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/PottedPlant_Small_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/PottedPlant_Small_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/PottedPlant_Small_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/PottedPlant_Tall_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/PottedPlant_Tall_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/PottedPlant_Tall_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Side_table_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Sofa_2Seat.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Speaker_Floor.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Speaker_Soundbar.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Stereo_MainUnit.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Stereo_Speaker.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Stool_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Stool_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Stool_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Stool_4.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/TV_Modern.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/TV_Retro.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/TV_remote_control.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Table.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Vase_1.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Vase_2.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/Prefabs/Vase_3.prefab | variant-of: - | scripts: -
+- Assets/LowPolyLivingRoomPack/ScenesDemo/LowPolyLivingRoomPack_Demo.prefab | variant-of: - | scripts: -
+- Assets/PolyOne/Cartoon Dog, Cat/Prefab/SM_CartoonAnimal_Cat.prefab | variant-of: - | scripts: -
+- Assets/PolyOne/Cartoon Dog, Cat/Prefab/SM_CartoonAnimal_Dog.prefab | variant-of: - | scripts: -
+- Assets/Prefabs/Chloe.prefab | variant-of: Assets/Art/Character/deneme.fbx | scripts: CharacterPresenter
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Armchair.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Armchair.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Bean_Bag_1.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Bean_Bag_1.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Bean_Bag_2.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Bean_Bag_2.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Bed.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Bed.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Billiard.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Billiard.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Bobby_Rigged.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/CHARACTERS/Bobby_Rigged.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_1.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Book_1.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_2.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Book_2.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_3.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Book_3.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_4.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Book_4.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_5.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Book_5.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Bookshelf.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Bookshelf.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Cactus_1.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Cactus_1.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Cactus_2.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Cactus_2.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Car_Decor_Blue.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Car_Decor_Blue.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Car_Decor_Purple.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Car_Decor_Purple.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Car_Decor_Red.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Car_Decor_Red.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Ceiling_Only.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Ceiling_Only.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Chair.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Chair.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Chess_Chair.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Chess_Chair.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Chess_Table.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Chess_Table.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Chloe_Rigged.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/CHARACTERS/Chloe_Rigged.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Claw_Machine.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Claw_Machine.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Closet.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Closet.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Coke.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Coke.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Dance_Floor.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Dance_Floor.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Dart.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Dart.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Dart_Blue.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Dart_Blue.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Dart_Green.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Dart_Green.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Dart_Red.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Dart_Red.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Decor_Dance_Text.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Decor_Dance_Text.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Decor_Disco_Text.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Decor_Disco_Text.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Decor_Game_Controller.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Decor_Game_Controller.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Decor_Game_Over.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Decor_Game_Over.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Desk.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Desk.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Disco_Speaker.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Disco_Speaker.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Discoball.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Discoball.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Drawer.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Drawer.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Foosball_Table.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Foosball_Table.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Game_Controller_Black.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Game_Controller_Black.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Game_Controller_Blue.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Game_Controller_Blue.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Game_Controller_Green.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Game_Controller_Green.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Game_Controller_Orange.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Game_Controller_Orange.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Globe.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Globe.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Ground_Blue.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Ground_Blue.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Ground_Brown.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Ground_Brown.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Ground_Default.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Ground_Default.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Ground_Disco_1.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Ground_Disco_1.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Ground_Disco_2.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Ground_Disco_2.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Ground_Red.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Ground_Red.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Guitar.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Guitar.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Headphone.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Headphone.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Jackson_Rigged.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/CHARACTERS/Jackson_Rigged.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Lamp.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Lamp.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Lamp_Big.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Lamp_Big.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Lisa_Rigged.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/CHARACTERS/Lisa_Rigged.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Lucas_Rigged.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/CHARACTERS/Lucas_Rigged.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Musical_Notes (1).prefab | variant-of: - | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Musical_Notes (2).prefab | variant-of: - | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Musical_Notes.prefab | variant-of: - | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Nora_Rigged.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/CHARACTERS/Nora_Rigged.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/PC_Set.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/PC_Set.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Patrick_Rigged.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/CHARACTERS/Patrick_Rigged.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Pizza.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Pizza.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Plant_1.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Plant_1.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Plant_2.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Plant_2.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Poster_Blue_Quotation.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Poster_Blue_Quotation.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Poster_Game.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Poster_Game.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Poster_Green_Quotation.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Poster_Green_Quotation.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Poster_Loading.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Poster_Loading.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Poster_Red_Quotation.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Poster_Red_Quotation.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Room_Fence.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Room_Fence.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Rubiks_Cube.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Rubiks_Cube.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Stacey_Rigged.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/CHARACTERS/Stacey_Rigged.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Stairs.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Stairs.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/TV_Set.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/TV_Set.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Table.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Table.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Toy_Bear.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Toy_Bear.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Toy_Monkey.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Toy_Monkey.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Toy_Penguin.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Toy_Penguin.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Toy_Rabbit.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Toy_Rabbit.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_Corner.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_Corner.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_Corner_Ceiling.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_Corner_Ceiling.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_Default.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_Default.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_Default_Ceiling.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_Default_Ceiling.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_Discoroom.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_Discoroom.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_Only.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_Only.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_With_Door.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_With_Door.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_With_Door_Ceiling.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_With_Door_Ceiling.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_With_Window.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_With_Window.fbx | scripts: -
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Wall_With_Window_Ceiling.prefab | variant-of: Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PROPS/Wall_With_Window_Ceiling.fbx | scripts: -
+
+## Scenes
+
+- Assets/FruitMerge/Scenes/Game.unity
+- Assets/LowPolyBoy/FreeStylizedBedRoom/DemoScene/DemoScene_01_template.unity
+- Assets/LowPolyLivingRoomPack/ScenesDemo/LowPolyLivingRoomPack_Demo.unity
+- Assets/PolyOne/Cartoon Dog, Cat/Scene/Demo Scene - Cartoon Dog, Cat.unity
+- Assets/Scenes/Room.unity
+- Assets/Scenes/SampleScene.unity
+- Assets/Scenes/_Sandbox/VoiceHarness.unity
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/SCENES/All_Prefabs_Scene.unity
+- Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/SCENES/Demo_Scene.unity
+
+## Runtime load surface
+
+- Assets/TextMesh Pro/Resources | 21 file(s) | loaded by string at runtime; ships in every build

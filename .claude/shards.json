@@ -1,0 +1,14 @@
+{
+  "_comment": "unity-dev — SINGLE SOURCE OF TRUTH for path -> codemap shard. SKILL.md, build_codemap.py and build_index.py all read this file; none of them carries its own copy of the mapping. First matching pattern wins, so order matters: Editor before specific shards, catch-all last. Patterns are gitignore-style globs relative to the project root: ** crosses directories, * stays inside one segment.",
+  "version": 1,
+  "shards": [
+    { "name": "fruitmerge",   "patterns": ["Assets/FruitMerge/**"],            "note": "vendored Fruit Merge minigame, imported as-is. FIRST on purpose: its own Scripts/UI and Editor folders would otherwise be swallowed by the ui and editor shards below and mix vendor code into the host's maps" },
+    { "name": "editor",       "patterns": ["**/Editor/**"],                    "note": "editor-only tools; never in a build" },
+    { "name": "ui",           "patterns": ["**/Scripts/UI/**"],                "note": "captions, PTT button, text input, HUD, ad-stub panel" },
+    { "name": "voice",        "patterns": ["**/Scripts/Voice/**"],             "note": "Gemini Live WebSocket transport, mic capture, playback, tool-call dispatch" },
+    { "name": "session",      "patterns": ["**/Scripts/Session/**"],           "note": "flow state machine, states, break planning" },
+    { "name": "presentation", "patterns": ["**/Scripts/Presentation/**"],      "note": "character reactions, camera rig, ad stub" },
+    { "name": "persistence",  "patterns": ["**/Scripts/Persistence/**"],       "note": "profile schema, local JSON repository, summarization" },
+    { "name": "core",         "patterns": ["**"],                              "note": "catch-all: Config, Bootstrap composition root, shared services" }
+  ]
+}

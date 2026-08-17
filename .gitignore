@@ -105,3 +105,55 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# unity-dev skill
+.claude/preflight/
+.claude/settings.local.json
+.claude/hooks/__pycache__/
+
+# Study With Me — local Gemini API key, never committed
+/Assets/Config/GeminiApiConfig.asset
+/Assets/Config/GeminiApiConfig.asset.meta
+
+# Study With Me — OS / IDE noise
+.DS_Store
+**/.DS_Store
+.idea/
+
+# Study With Me — README source screenshots (published copies live in docs/screenshots/)
+/readme_png/
+
+# Study With Me — the Fruit Merge source project, kept locally for reference.
+# The game itself is vendored into Assets/FruitMerge/ (that IS what game mode
+# loads); this root folder is a second, unreferenced copy of the same content
+# and Unity never sees it, since it sits outside Assets/.
+/Fruit-Merge-main/
+
+# Study With Me — unreferenced third-party content, excluded to keep the repo
+# clonable. Every path below was checked against Room.unity/Game.unity by
+# walking Unity GUID references transitively; none of them is reachable.
+# Nothing here is deleted locally — it is only kept out of the repository.
+
+# Trip Hop Music: DanceModeController.tracks wires exactly two of the ten
+# tracks. The other eight are 251 MB of uncompressed WAV nothing points at.
+/Assets/Trip Hop Music/Eroded World.wav*
+/Assets/Trip Hop Music/Like a Machine.wav*
+/Assets/Trip Hop Music/Mysterious Fighter.wav*
+/Assets/Trip Hop Music/Night Racer.wav*
+/Assets/Trip Hop Music/Preach.wav*
+/Assets/Trip Hop Music/Ripped.wav*
+/Assets/Trip Hop Music/They Say.wav*
+/Assets/Trip Hop Music/Whisper in the Dark.wav*
+
+# LowPolyLivingRoomPack: all 158 of its GUIDs, zero hits in Room.unity. The
+# room was built from LowPolyBoy + ZNS3D instead; blueprint.md still names
+# this pack, which is stale rather than accurate.
+/Assets/LowPolyLivingRoomPack/
+
+# Vendor demo scenes and the character art belonging to characters this
+# project does not use (Chloe is built from Assets/Art/Character/deneme.fbx,
+# not from the pack's rigged characters — see decisions.md D-010).
+/Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/SCENES/
+/Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/TEXTURES/*_Face_Alpha.png*
+/Assets/LowPolyBoy/FreeStylizedBedRoom/DemoScene/
+/Assets/PolyOne/Cartoon Dog, Cat/Scene/
