@@ -15,6 +15,27 @@ public class GeminiSetup
     [JsonProperty("inputAudioTranscription")] public object InputAudioTranscription = new object();
     [JsonProperty("outputAudioTranscription")] public object OutputAudioTranscription = new object();
     [JsonProperty("realtimeInputConfig")] public GeminiRealtimeInputConfig RealtimeInputConfig = new GeminiRealtimeInputConfig();
+    [JsonProperty("sessionResumption")] public GeminiSessionResumption SessionResumption = new GeminiSessionResumption();
+    [JsonProperty("contextWindowCompression")] public GeminiContextWindowCompression ContextWindowCompression = new GeminiContextWindowCompression();
+}
+
+/// <summary>
+/// Present with no handle = start a fresh session but send resumption updates.
+/// Present with a handle = carry on the session that handle names.
+/// </summary>
+public class GeminiSessionResumption
+{
+    [JsonProperty("handle", NullValueHandling = NullValueHandling.Ignore)] public string Handle;
+}
+
+/// <summary>
+/// What actually removes the ~15-minute audio session cap: with a sliding
+/// window the server compresses old turns instead of ending the session.
+/// targetTokens/triggerTokens are left to the server's documented defaults.
+/// </summary>
+public class GeminiContextWindowCompression
+{
+    [JsonProperty("slidingWindow")] public object SlidingWindow = new object();
 }
 
 public class GeminiGenerationConfig
@@ -109,6 +130,20 @@ public class GeminiServerMessage
     [JsonProperty("setupComplete")] public object SetupComplete;
     [JsonProperty("serverContent")] public GeminiServerContent ServerContent;
     [JsonProperty("toolCall")] public GeminiToolCall ToolCall;
+    [JsonProperty("sessionResumptionUpdate")] public GeminiSessionResumptionUpdate SessionResumptionUpdate;
+    [JsonProperty("goAway")] public GeminiGoAway GoAway;
+}
+
+public class GeminiSessionResumptionUpdate
+{
+    [JsonProperty("newHandle")] public string NewHandle;
+    [JsonProperty("resumable")] public bool Resumable;
+}
+
+/// <summary>Warning that the connection is about to be closed as ABORTED.</summary>
+public class GeminiGoAway
+{
+    [JsonProperty("timeLeft")] public string TimeLeft;
 }
 
 public class GeminiServerContent

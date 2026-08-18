@@ -109,10 +109,12 @@ public class CharacterPresenter : MonoBehaviour
     // offset cannot accumulate frame over frame.
     private void LateUpdate()
     {
-        // Dancing owns the face while it lasts, so the two cycles can never both
-        // write a cell on the same frame.
-        if (_isDancing) TickDanceCycle();
-        else if (_isSpeaking) TickTalkCycle();
+        // Speaking outranks dancing, reversing what D-025 decided: talking has to
+        // be visible in every state, so the mouth wins the face and the dance cycle
+        // resumes the moment she stops. Still exactly one cycle per frame, so the
+        // two can never both write a cell.
+        if (_isSpeaking) TickTalkCycle();
+        else if (_isDancing) TickDanceCycle();
         if (!lockPose) return;
 
         float target = _isSpeaking || previewSpeaking ? 1f : 0f;
@@ -152,6 +154,13 @@ public class CharacterPresenter : MonoBehaviour
     // subscribing to the voice session itself, which Presentation may not do.
     public bool IsSpeaking { get { return _isSpeaking; } }
 
+    // The whole turn, not just her half of it. Ambient behaviour needs to know
+    // that a CONVERSATION is happening — listening and thinking are as much part
+    // of one as speaking is — and reading IsSpeaking alone is what had the desk
+    // routine turn back to the book while the user was still talking. Read-only
+    // for the same reason IsSpeaking is: SetTurnState remains the only writer.
+    public TurnState CurrentTurn { get; private set; }
+
     // Dance mode says only whether she is dancing; which cell shows stays in
     // here, so the face keeps a single writer.
     public void SetDancing(bool dancing)
@@ -159,6 +168,11 @@ public class CharacterPresenter : MonoBehaviour
         _isDancing = dancing;
         _danceClock = 0f;
         _danceFrame = 0;
+
+        // Speaking outranks dancing now, so starting or ending a dance must not
+        // paint over a mouth shape that is mid-sentence.
+        if (_isSpeaking) return;
+
         SetExpression(dancing ? DanceCycle[0] : FaceExpression.Neutral);
     }
 
@@ -180,16 +194,15 @@ public class CharacterPresenter : MonoBehaviour
 
     public void SetTurnState(TurnState state)
     {
+        CurrentTurn = state;
         SetTalking(state == TurnState.Speaking);
         _isSpeaking = state == TurnState.Speaking;
         _talkClock = 0f;
         _talkFrame = 0;
 
-        // A live voice session must not repaint the face mid-dance — that would
-        // put two writers on it. The animator flags above still update, so the
-        // session picks up where it left off once the dance ends.
-        if (_isDancing) return;
-
+        // No dance early-out any more: talking has to show in every state. There
+        // is still only one writer here — the dance never paints from outside,
+        // it only asks for the cell it would have shown, on the Idle branch below.
         switch (state)
         {
             case TurnState.Listening:
@@ -202,10 +215,15 @@ public class CharacterPresenter : MonoBehaviour
                 SetExpression(TalkCycle[0]);
                 break;
             default:
-                // Not Neutral if she is reading: the turn state churns back to Idle
-                // between sentences, and repainting Neutral there would blink the
-                // looking-down face off for no reason the viewer can see.
-                SetExpression(_isReading ? FaceExpression.LookDown : FaceExpression.Neutral);
+                // Idle: hand the face back to whatever was showing underneath, in
+                // the same order of precedence. Not Neutral if she is dancing or
+                // reading — the turn state churns back to Idle between sentences,
+                // and repainting Neutral there would blink the dance face or the
+                // looking-down face off for no reason the viewer can see, and the
+                // dance cycle would take up to danceFrameSeconds to notice.
+                SetExpression(_isDancing
+                    ? DanceCycle[_danceFrame]
+                    : _isReading ? FaceExpression.LookDown : FaceExpression.Neutral);
                 break;
         }
     }

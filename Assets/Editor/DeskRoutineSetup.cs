@@ -2,7 +2,6 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.UI;
 
 // Stands up the desk routine: the arm IK rig, the hand targets, and the wiring.
 //
@@ -53,7 +52,6 @@ public static class DeskRoutineSetup
         DeskRoutine routine = WireRoutine(presenter, ik);
 
         SeedHandTargets(routine);
-        EnsureStudyButton(routine);
         ReportReach(ik, routine);
 
         AssetDatabase.SaveAssets();
@@ -194,6 +192,18 @@ public static class DeskRoutineSetup
         // target: move the book and the angle follows.
         if (routine.bookTarget == null && routine.book != null) routine.bookTarget = routine.book.transform;
 
+        // Who she turns to when spoken to: the room camera, i.e. where the user is.
+        // Read off DanceModeController rather than searched for again, the same way
+        // game mode reads its cast — one wiring to be wrong instead of two, and the
+        // modes cannot end up pointing at different cameras.
+        if (routine.conversationTarget == null && routine.danceMode != null && routine.danceMode.mainCamera != null)
+            routine.conversationTarget = routine.danceMode.mainCamera.transform;
+
+        if (routine.conversationTarget == null)
+            Debug.LogWarning("[DeskRoutine] no conversation target could be resolved; she will " +
+                             "return to the authored monitor pose while being talked to instead " +
+                             "of turning to the user. Assign it by hand.", routine);
+
         if (routine.book == null)
             Debug.LogWarning("[DeskRoutine] no BookPageTurner in the scene, so no page will turn. " +
                              "Run Tools > StudyWithMe > Set Up Book Pages.", routine);
@@ -226,95 +236,6 @@ public static class DeskRoutineSetup
             routine.pageHand = MakeTarget(routine, "HandTarget_Page", routine.bookTarget, new Vector3(0f, 0.05f, 0f));
 
         EditorUtility.SetDirty(routine);
-    }
-
-    /// <summary>
-    /// Puts a "study" button on the existing mode canvas, under the game one.
-    ///
-    /// Measured against the game button rather than placed at a corner — the same
-    /// method the game button used against the dance button, and for the same reason:
-    /// a hardcoded position is how the first of these landed on top of another. The
-    /// result is a dance / game / study column that survives any of them being dragged.
-    ///
-    /// The component sits on the canvas root beside GameModeButton, which is where that
-    /// one lives too.
-    /// </summary>
-    private static void EnsureStudyButton(DeskRoutine routine)
-    {
-        GameModeButton gameUi = Object.FindFirstObjectByType<GameModeButton>();
-
-        if (gameUi == null || gameUi.startButton == null)
-        {
-            Debug.LogWarning("[DeskRoutine] no game-mode button to measure against, so no study button was " +
-                             "created. Run Tools > StudyWithMe > Set Up Game Mode first.");
-            return;
-        }
-
-        StudyModeButton study = gameUi.GetComponent<StudyModeButton>();
-
-        if (study == null) study = Undo.AddComponent<StudyModeButton>(gameUi.gameObject);
-
-        Undo.RecordObject(study, "Wire StudyModeButton");
-        study.studyMode = routine;
-
-        if (study.button == null)
-        {
-            RectTransform above = (RectTransform)gameUi.startButton.transform;
-            Font font = gameUi.startLabel != null ? gameUi.startLabel.font : null;
-
-            study.button = CreateStackedButton(above, "StudyModeButton", study.idleLabel, font, out Text label);
-            study.label = label;
-
-            Debug.Log("[DeskRoutine] added the study button under '" + above.name + "'.", study.button);
-        }
-
-        EditorUtility.SetDirty(study);
-    }
-
-    private static Button CreateStackedButton(RectTransform above, string name, string caption,
-                                              Font font, out Text text)
-    {
-        GameObject go = new GameObject(name, typeof(RectTransform));
-        Undo.RegisterCreatedObjectUndo(go, "Create " + name);
-        go.transform.SetParent(above.parent, false);
-
-        RectTransform rect = (RectTransform)go.transform;
-        rect.anchorMin = above.anchorMin;
-        rect.anchorMax = above.anchorMax;
-        rect.pivot = above.pivot;
-        rect.sizeDelta = above.sizeDelta;
-
-        const float gap = 12f;
-        rect.anchoredPosition = above.anchoredPosition - new Vector2(0f, above.sizeDelta.y + gap);
-
-        go.AddComponent<CanvasRenderer>();
-        Image image = go.AddComponent<Image>();
-        image.color = new Color(0.12f, 0.12f, 0.14f, 0.85f);
-
-        Button button = go.AddComponent<Button>();
-        button.targetGraphic = image;
-
-        GameObject labelGo = new GameObject("Label", typeof(RectTransform));
-        labelGo.transform.SetParent(go.transform, false);
-
-        RectTransform labelRect = (RectTransform)labelGo.transform;
-        labelRect.anchorMin = Vector2.zero;
-        labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = Vector2.zero;
-        labelRect.offsetMax = Vector2.zero;
-
-        labelGo.AddComponent<CanvasRenderer>();
-        text = labelGo.AddComponent<Text>();
-        text.text = caption;
-        text.alignment = TextAnchor.MiddleCenter;
-        text.color = Color.white;
-        text.fontSize = 22;
-        // Copied from the button above rather than fetched by a built-in name: that
-        // name is a moving target (Unity 6 retired Arial.ttf) and fonts do not come
-        // from AssetDatabase.GetBuiltinExtraResource at all.
-        text.font = font != null ? font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-
-        return button;
     }
 
     private static Transform MakeTarget(DeskRoutine routine, string name, Transform at)

@@ -1,4 +1,4 @@
-<!-- stamp: 2026-08-17T13:37Z source-sig:edb7070d72b5 scenes:9 prefabs:198 generator:python-fallback status: DEGRADED 180 missing-script -->
+<!-- stamp: 2026-08-18T07:36Z source-sig:c4cb7d066879 scenes:9 prefabs:198 generator:python-fallback status: DEGRADED 168 missing-script -->
 # unitymap — scene and prefab structure
 
 Read this instead of opening a `.unity`/`.prefab` file. Tree indentation is
@@ -71,7 +71,7 @@ Unity menu item Tools > unity-dev > Export unitymap.
 - MISSING SCRIPT | Assets/FruitMerge/Scenes/Game.unity | Star2
 - MISSING SCRIPT | Assets/FruitMerge/Scenes/Game.unity | Star3
 - MISSING SCRIPT | Assets/FruitMerge/Scenes/Game.unity | Text (TMP)
-- ... 101 more
+- ... 97 more
 
 ## PREFAB Assets/FruitMerge/Prefabs/ComboPopup.prefab   (1 object(s))
 - ComboPopup  [RectTransform, MeshRenderer, MISSING SCRIPT (guid:9541d86e), ComboPopupItem]  refs: parentLinkedComponent=NULL
@@ -704,21 +704,14 @@ Unity menu item Tools > unity-dev > Export unitymap.
 ## PREFAB Assets/Prefabs/Chloe.prefab   variant-of: Assets/Art/Character/deneme.fbx   (2 object(s))
 - * Chloe  (prefab instance of Assets/Art/Character/deneme.fbx)
 
-## SCENE Assets/Scenes/Room.unity   (191 object(s))
+## SCENE Assets/Scenes/Room.unity   (181 object(s))
 - wall  [Transform]
   - wall_window  [Transform]
   - wall_door  [Transform]
 - camera_game  [MISSING SCRIPT (guid:a79441f3), AudioListener, Camera, Transform]
 - Quad (1)  [MeshCollider, MeshRenderer, MeshFilter, Transform]
 - Cat  [PetRoamer, Transform]  refs: animator=set
-- --GameMode--  [GameModeController, Transform]  refs: chloe=set, chloeAnimator=set, danceMode=set, gameCamera=set, mainCamera=set, pets=set, roomUi=set, zoomCamera=set
-- --GameUI--  [GameModeButton, MISSING SCRIPT (guid:dc42784c), MISSING SCRIPT (guid:0cd44c10), Canvas, RectTransform, StudyModeButton]  refs: backButton=set, gameMode=set, startButton=set, startLabel=set, button=set, label=set, studyMode=set
-  - GameModeButton  [RectTransform, MISSING SCRIPT (guid:fe87c0e1), CanvasRenderer, MISSING SCRIPT (guid:4e29b1a8)]
-    - Label  [MISSING SCRIPT (guid:5f7201a1), CanvasRenderer, RectTransform]
-  - BackToRoomButton [inactive]  [MISSING SCRIPT (guid:4e29b1a8), MISSING SCRIPT (guid:fe87c0e1), CanvasRenderer, RectTransform]
-    - Label  [RectTransform, MISSING SCRIPT (guid:5f7201a1), CanvasRenderer]
-  - StudyModeButton  [RectTransform, MISSING SCRIPT (guid:fe87c0e1), CanvasRenderer, MISSING SCRIPT (guid:4e29b1a8)]
-    - Label  [MISSING SCRIPT (guid:5f7201a1), CanvasRenderer, RectTransform]
+- --GameMode--  [GameModeController, Transform]  refs: chloe=set, chloeAnimator=set, danceMode=set, gameCamera=set, mainCamera=set, pets=set, roomUi=NULL, zoomCamera=set
 - ground  [Transform]
 - Quad  [MeshCollider, MeshRenderer, MeshFilter, Transform]
 - spot_light  [Transform]
@@ -740,10 +733,7 @@ Unity menu item Tools > unity-dev > Export unitymap.
 - EventSystem  [MISSING SCRIPT (guid:76c392e4), Transform, MISSING SCRIPT (guid:01614664)]
 - books  [Transform]
 - --Systems--  [Transform]
-  - SessionController  [Transform, RoomSessionController, GeminiLiveVoiceSession]  refs: character=set, session=set, config=set
-- --DanceUI--  [DanceModeButton, MISSING SCRIPT (guid:dc42784c), MISSING SCRIPT (guid:0cd44c10), Canvas, RectTransform]  refs: button=set, danceMode=set, label=set
-  - DanceModeButton  [RectTransform, MISSING SCRIPT (guid:fe87c0e1), CanvasRenderer, MISSING SCRIPT (guid:4e29b1a8)]
-    - Label  [MISSING SCRIPT (guid:5f7201a1), CanvasRenderer, RectTransform]
+  - SessionController  [Transform, RoomSessionController, GeminiLiveVoiceSession]  refs: character=set, danceMode=set, gameMode=set, persona=set, session=set, studyMode=set, talkButton=set, config=set
 - spotlight_disco  [Transform]
   - Dance_Floor_Spotlight.001  [Transform, MeshRenderer, MeshFilter]
     - r  [Transform, CapsuleCollider, MeshRenderer, MeshFilter]
@@ -762,6 +752,8 @@ Unity menu item Tools > unity-dev > Export unitymap.
   - lpbns_br_desk_drawer_01 (2)  [Transform, MeshRenderer, MeshFilter]
 - Dog  [PetRoamer, Transform]  refs: animator=set
 - Main Camera  [AudioListener, Camera, Transform, MISSING SCRIPT (guid:a79441f3)]
+- --SessionUI--  [PushToTalkButtonView, MISSING SCRIPT (guid:dc42784c), MISSING SCRIPT (guid:0cd44c10), Canvas, RectTransform]  refs: button=set, idleSprite=set, image=set, listeningSprite=set
+  - TalkButton  [MISSING SCRIPT (guid:fe87c0e1), CanvasRenderer, RectTransform, MISSING SCRIPT (guid:4e29b1a8)]
 - * lpbns_br_floor  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
 - * lpbns_br_computer_mousepad  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Models/lpbns_br_computer_mousepad.fbx)
 - * lpbns_br_floor (1)  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
@@ -796,12 +788,10 @@ Unity menu item Tools > unity-dev > Export unitymap.
 - * lpbns_br_floor (1)  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
 - * Book_1  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_1.prefab)
 - * lpbns_br_floor  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
-- * Meshy_AI_Cozy_Casual_Ensemble_0810100721_texture  (prefab instance of Assets/Art/Character/Meshy_AI_Cozy_Casual_Ensemble_0810100721_texture.fbx)
 - * lpbns_br_floor  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
 - * Game_Controller_Orange  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Game_Controller_Orange.prefab)
 - * lpbns_br_curtain (1)  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_curtain.prefab)
 - * Globe  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Globe.prefab)
-- * Stacey_Rigged  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Stacey_Rigged.prefab)
 - * Book_2  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_2.prefab)
 - * Disco_Speaker (2)  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Disco_Speaker.prefab)
 - * lpbns_br_floor  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
@@ -825,7 +815,17 @@ Unity menu item Tools > unity-dev > Export unitymap.
 - * TV_Set  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/TV_Set.prefab)
 - * Book_3 (2)  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_3.prefab)
 - * lpbns_br_floor (1)  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
-- ... 71 more object(s) not listed; regenerate with the Editor exporter for the full tree
+- * Musical_Notes  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Musical_Notes.prefab)
+- * lpbns_br_wall_window  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_wall_window.prefab)
+- * lpbns_br_floor  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
+- * lpbns_br_chair  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_chair.prefab)
+- * lpbns_br_floor  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
+- * Book_2 (1)  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_2.prefab)
+- * lpbns_br_floor  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
+- * lpbns_br_floor (1)  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_floor.prefab)
+- * Book_5  (prefab instance of Assets/ZNS3D/FREE_STYLIZED_GAMEROOM_PACK/PREFABS/Book_5.prefab)
+- * lpbns_br_plants_03  (prefab instance of Assets/LowPolyBoy/FreeStylizedBedRoom/Prefabs/lpbns_br_plants_03.prefab)
+- ... 61 more object(s) not listed; regenerate with the Editor exporter for the full tree
 
 ## SCENE Assets/Scenes/SampleScene.unity   (3 object(s))
 - Main Camera  [AudioListener, Camera, Transform, MISSING SCRIPT (guid:a79441f3)]
@@ -1342,7 +1342,6 @@ Unity menu item Tools > unity-dev > Export unitymap.
 - ComboPopupDirector | Assets/FruitMerge/Scripts/Services/ComboPopupDirector.cs
 - ComboPopupItem | Assets/FruitMerge/Scripts/Gameplay/ComboPopupItem.cs
 - ConfettiDirector | Assets/FruitMerge/Scripts/Services/ConfettiDirector.cs
-- DanceModeButton | Assets/Scripts/Presentation/DanceModeButton.cs
 - DanceModeController | Assets/Scripts/Presentation/DanceModeController.cs
 - DropController | Assets/FruitMerge/Scripts/Gameplay/DropController.cs
 - DropIndicatorController | Assets/FruitMerge/Scripts/Gameplay/DropIndicatorController.cs
@@ -1351,7 +1350,6 @@ Unity menu item Tools > unity-dev > Export unitymap.
 - FruitChainView | Assets/FruitMerge/Scripts/UI/FruitChainView.cs
 - FruitColorTitle | Assets/FruitMerge/Scripts/UI/FruitColorTitle.cs
 - FruitFace | Assets/FruitMerge/Scripts/Gameplay/FruitFace.cs
-- GameModeButton | Assets/Scripts/Presentation/GameModeButton.cs
 - GameModeController | Assets/Scripts/Presentation/GameModeController.cs
 - GameOverPanel | Assets/FruitMerge/Scripts/UI/GameOverPanel.cs
 - GeminiLiveVoiceSession | Assets/Scripts/Voice/GeminiLiveVoiceSession.cs
@@ -1360,9 +1358,9 @@ Unity menu item Tools > unity-dev > Export unitymap.
 - NextFruitDisplay | Assets/FruitMerge/Scripts/Gameplay/NextFruitDisplay.cs
 - PausePanel | Assets/FruitMerge/Scripts/UI/PausePanel.cs
 - PetRoamer | Assets/Scripts/Presentation/PetRoamer.cs
+- PushToTalkButtonView | Assets/Scripts/UI/PushToTalkButtonView.cs
 - RoomSessionController | Assets/Scripts/Bootstrap/RoomSessionController.cs
 - SaveService | Assets/FruitMerge/Scripts/Services/SaveService.cs
 - ScreenBackground | Assets/FruitMerge/Scripts/UI/ScreenBackground.cs
 - SplashPanel | Assets/FruitMerge/Scripts/UI/SplashPanel.cs
-- StudyModeButton | Assets/Scripts/Presentation/StudyModeButton.cs
 - VoiceHarnessHud | Assets/Scripts/Voice/VoiceHarnessHud.cs

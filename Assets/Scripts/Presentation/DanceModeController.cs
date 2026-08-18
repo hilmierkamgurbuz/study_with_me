@@ -101,9 +101,6 @@ public class DanceModeController : MonoBehaviour
     {
         if (chloe == null) { Debug.LogError("[DanceMode] chloe is not assigned.", this); enabled = false; return; }
 
-        _deskPosition = chloe.RestingPosition;
-        _deskRotation = chloe.RestingRotation;
-
         if (chloeAnimator != null)
         {
             _armsLayer = chloeAnimator.GetLayerIndex(armsLayerName);
@@ -154,6 +151,17 @@ public class DanceModeController : MonoBehaviour
     public void StartDance()
     {
         if (_phase != Phase.Off) return;
+
+        // Read HERE, not in Start(). CharacterPresenter fills RestingPosition in
+        // its own Start() and the order between two Start() calls is undefined —
+        // D-037 fixed exactly this race in GameModeController and left it standing
+        // here because it happened to be won on the desktop. On a phone it was
+        // lost: the dance captured (0,0,0) and returned her to the world origin
+        // instead of her chair. By the time a dance is asked for, everything in
+        // the scene has been awake for many frames, so the race is gone rather
+        // than made less likely.
+        _deskPosition = chloe.RestingPosition;
+        _deskRotation = chloe.RestingRotation;
 
         _phase = Phase.Arriving;
         _clock = 0f;

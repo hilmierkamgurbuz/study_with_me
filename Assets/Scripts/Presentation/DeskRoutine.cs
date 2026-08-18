@@ -42,6 +42,17 @@ public class DeskRoutine : MonoBehaviour
     // CharacterPresenter.previewSpeaking. Untick before leaving Play.
     public bool previewPageReach;
 
+    [Header("Conversation")]
+    // What she turns to when she is being talked to — the room camera, i.e. the
+    // user. Without it she goes back to the authored monitor pose instead, which
+    // is where she was before but is not who she is answering.
+    public Transform conversationTarget;
+    // How long she stays turned to the user after the last thing either of them
+    // said. It is a HOLD, not a reaction: the turn state churns back to Idle
+    // between sentences, and returning to the book in those gaps is exactly what
+    // made her look like she had stopped listening mid-exchange.
+    public float conversationHoldSeconds = 8f;
+
     [Header("Who else can own her")]
     public DanceModeController danceMode;
     public GameModeController gameMode;
@@ -70,13 +81,18 @@ public class DeskRoutine : MonoBehaviour
     // edits are discarded on exit while the console is not.
     public bool tunePose;
 
-    // Off until the button says otherwise. She is meant to be talked to first, and a
-    // character who turns to her book the moment the scene loads has decided the
-    // conversation is over before it started.
+    // Where she is turned. Private and nested, the same shape DanceModeController's
+    // Phase takes: nothing outside chooses a facing, it only says what is happening.
+    private enum DeskFacing { Desk, Book, Conversation }
+
+    // Off until the conversation says otherwise. She is meant to be talked to first,
+    // and a character who turns to her book the moment the scene loads has decided
+    // the conversation is over before it started.
     private bool _studying;
 
     private float _pageClock;
     private float _gestureClock;
+    private float _conversationClock;
 
     private Vector3 _deskPosition;
     private Quaternion _deskRotation;
@@ -101,6 +117,8 @@ public class DeskRoutine : MonoBehaviour
     {
         _studying = true;
         _pageClock = 0f;
+        // A fresh block does not start held: the words that asked for it are over.
+        _conversationClock = 0f;
     }
 
     [ContextMenu("Stop Studying")]
@@ -123,7 +141,7 @@ public class DeskRoutine : MonoBehaviour
             // Stopping mid-page leaves her turned to the book, so she is walked back
             // to the authored pose and only THEN left alone — once she has arrived,
             // nothing here writes at all and her pose has a single owner again.
-            if (_captured && !tunePose && !ModeOwnsHer && NotYetHome) FaceTowards(false);
+            if (_captured && !tunePose && !ModeOwnsHer && NotYetHome) FaceTowards(DeskFacing.Desk);
 
             return;
         }
@@ -141,10 +159,16 @@ public class DeskRoutine : MonoBehaviour
 
         CaptureDeskPose();
 
-        // Talking wins. She comes back to the pose the scene was authored with, which
-        // is the one facing the monitor, and the page clock freezes — conversation
-        // time is deliberately not counted as reading time.
-        bool working = !chloe.IsSpeaking;
+        // Conversation wins, and it is the WHOLE conversation — listening and
+        // thinking count, not just her half of it. Reading IsSpeaking alone had her
+        // facing the book while the user was still talking, and back at it the
+        // instant she finished a sentence. Any activity refreshes the hold; only
+        // silence runs it down, so she stays with the user until the exchange is
+        // actually over.
+        if (chloe.CurrentTurn != TurnState.Idle) _conversationClock = conversationHoldSeconds;
+        else if (_conversationClock > 0f) _conversationClock -= Time.deltaTime;
+
+        bool working = _conversationClock <= 0f;
 
         chloe.SetReading(working);
         ApplyHands(working);
@@ -152,8 +176,10 @@ public class DeskRoutine : MonoBehaviour
         // Skipped while tuning so a drag in the Scene view survives the frame. The
         // routine keeps running, which is the point: the pose has to be live to judge
         // where a hand belongs.
-        if (!tunePose) FaceTowards(working);
+        if (!tunePose) FaceTowards(working ? DeskFacing.Book : DeskFacing.Conversation);
 
+        // The page clock freezes for the whole hold: conversation time is
+        // deliberately not counted as reading time.
         if (!working) return;
 
         if (_gestureClock > 0f) _gestureClock -= Time.deltaTime;
@@ -196,16 +222,22 @@ public class DeskRoutine : MonoBehaviour
         _captured = true;
     }
 
-    /// <param name="towardsBook">false returns her to the pose the scene was authored
-    /// with, which is NOT recomputed from the monitor's position — she was placed
-    /// facing it by hand (measured 0.9 degrees off a computed look-at) and that
-    /// authored pose is the one to come back to.</param>
-    private void FaceTowards(bool towardsBook)
+    /// <param name="facing">Desk returns her to the pose the scene was authored with,
+    /// which is NOT recomputed from the monitor's position — she was placed facing it
+    /// by hand (measured 0.9 degrees off a computed look-at) and that authored pose is
+    /// the one to come back to. Conversation falls back to the same pose when no
+    /// target is wired, so a missing reference costs the look but never the routine.</param>
+    private void FaceTowards(DeskFacing facing)
     {
-        Quaternion want = towardsBook ? BookRotation() : _deskRotation;
+        bool towardsBook = facing == DeskFacing.Book;
+
+        Quaternion want = towardsBook ? BookRotation()
+            : facing == DeskFacing.Conversation ? ConversationRotation()
+            : _deskRotation;
 
         if (towardsBook) want *= Quaternion.Euler(0f, readingYawOffset, 0f);
 
+        // Only reading carries an offset; the other two sit where she was placed.
         Vector3 wantOffset = towardsBook ? readingPositionOffset : Vector3.zero;
 
         Quaternion next = Quaternion.RotateTowards(chloe.RestingRotation, want,
@@ -221,9 +253,21 @@ public class DeskRoutine : MonoBehaviour
 
     private Quaternion BookRotation()
     {
-        if (bookTarget == null) return _deskRotation;
+        return FlatLookAt(bookTarget);
+    }
 
-        Vector3 flat = bookTarget.position - _deskPosition;
+    private Quaternion ConversationRotation()
+    {
+        return FlatLookAt(conversationTarget);
+    }
+
+    // Yaw only: she swivels her whole body because the rig is Generic and aiming
+    // the head by hand would be the second writer on it that D-015 had to undo.
+    private Quaternion FlatLookAt(Transform target)
+    {
+        if (target == null) return _deskRotation;
+
+        Vector3 flat = target.position - _deskPosition;
         flat.y = 0f;
 
         return flat.sqrMagnitude > 0.000001f ? Quaternion.LookRotation(flat, Vector3.up) : _deskRotation;

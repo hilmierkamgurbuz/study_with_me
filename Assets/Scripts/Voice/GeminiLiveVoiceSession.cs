@@ -32,7 +32,27 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
     private TurnState _turnState = TurnState.Idle;
 
     private WebSocket _ws;
+    private string _url;
     private bool _setupComplete;
+
+    // Reconnect state. A dropped socket is not the end of a conversation: the
+    // server hands out a resumption handle, and reopening with it continues the
+    // same session, which is what removes the session-length ceiling.
+    private string _resumptionHandle;
+    private volatile bool _closedSignal;
+    private bool _closedHandled;
+    private bool _intentionalClose;
+    private bool _everConnected;
+    private int _reconnectAttempt;
+    private float _reconnectAt = -1f;
+
+    /// <summary>
+    /// True when the connection that just completed setup carried a resumption
+    /// handle — i.e. this is the same conversation, not a new one. Callers use
+    /// it to avoid greeting the user twice.
+    /// </summary>
+    public bool ResumedFromHandle { get; private set; }
+
     private bool _isListening;
     private string _micDevice;
     private AudioClip _micClip;
@@ -64,6 +84,21 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
 #if !UNITY_WEBGL || UNITY_EDITOR
         _ws?.DispatchMessageQueue();
 #endif
+        // The socket's close callback can land off the main thread, so it only
+        // raises a flag and everything that touches Unity happens here.
+        if (_closedSignal && !_closedHandled)
+        {
+            _closedHandled = true;
+            HandleSocketClosed();
+        }
+
+        if (_reconnectAt >= 0f && Time.unscaledTime >= _reconnectAt)
+        {
+            _reconnectAt = -1f;
+            Log("Reconnecting" + (string.IsNullOrEmpty(_resumptionHandle) ? "..." : " with resumption handle..."));
+            _ = OpenSocket();
+        }
+
         if (_isListening)
         {
             PumpMicAudio();
@@ -72,13 +107,16 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
 
     private void OnDestroy()
     {
-        if (_isListening) EndPushToTalk();
-        _ws?.Close();
+        Disconnect();
     }
 
     public async Task Connect(VoiceSessionConfig sessionConfig)
     {
         _sessionConfig = sessionConfig;
+        _intentionalClose = false;
+        _resumptionHandle = null;
+        _everConnected = false;
+        _reconnectAttempt = 0;
 
         if (config == null || string.IsNullOrEmpty(config.apiKey))
         {
@@ -86,8 +124,26 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
             return;
         }
 
-        string url = "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=" + config.apiKey;
-        _ws = new WebSocket(url);
+        _url = "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=" + config.apiKey;
+        await OpenSocket();
+    }
+
+    public void Disconnect()
+    {
+        _intentionalClose = true;
+        _reconnectAt = -1f;
+        if (_isListening) EndPushToTalk();
+        _ws?.Close();
+    }
+
+    private async Task OpenSocket()
+    {
+        _closedSignal = false;
+        _closedHandled = false;
+        _sendQueue.Clear();
+        _sending = false;
+
+        _ws = new WebSocket(_url);
 
         _ws.OnOpen += () =>
         {
@@ -97,19 +153,43 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
         _ws.OnError += e =>
         {
             Log("WebSocket error: " + e);
-            _setupComplete = false;
-            OnDisconnected?.Invoke();
             Faulted?.Invoke(new Exception("WebSocket error: " + e));
+            _closedSignal = true;
         };
         _ws.OnClose += e =>
         {
             Log("WebSocket closed: " + e);
-            _setupComplete = false;
-            OnDisconnected?.Invoke();
+            _closedSignal = true;
         };
         _ws.OnMessage += HandleMessage;
 
         await _ws.Connect();
+    }
+
+    /// <summary>
+    /// Runs on the main thread, once per close. Reopens the socket unless the
+    /// close was asked for — or unless the very first connection never
+    /// succeeded, since retrying a bad key or a retired model forever is a loop
+    /// with no way out of it.
+    /// </summary>
+    private void HandleSocketClosed()
+    {
+        _setupComplete = false;
+
+        if (_isListening)
+        {
+            _isListening = false;
+            Microphone.End(_micDevice);
+        }
+        SetTurnState(TurnState.Idle);
+        OnDisconnected?.Invoke();
+
+        if (_intentionalClose || !_everConnected) return;
+
+        _reconnectAttempt++;
+        float max = _sessionConfig != null ? _sessionConfig.ReconnectBackoffMaxSeconds : 0f;
+        float delay = _reconnectAttempt <= 1 ? 0f : Mathf.Pow(2f, _reconnectAttempt - 2);
+        _reconnectAt = Time.unscaledTime + (max > 0f ? Mathf.Min(delay, max) : delay);
     }
 
     public void SetMicPolicy(MicPolicy policy)
@@ -190,6 +270,9 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
         {
             Setup = new GeminiSetup { Model = config.liveModelId }
         };
+
+        ResumedFromHandle = !string.IsNullOrEmpty(_resumptionHandle);
+        setup.Setup.SessionResumption.Handle = _resumptionHandle;
 
         if (!string.IsNullOrEmpty(_sessionConfig?.SystemInstruction))
         {
@@ -285,9 +368,26 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
         if (msg.SetupComplete != null)
         {
             _setupComplete = true;
-            Log("Setup complete.");
+            _everConnected = true;
+            _reconnectAttempt = 0;
+            Log("Setup complete." + (ResumedFromHandle ? " (resumed)" : string.Empty));
             OnConnected?.Invoke();
             return;
+        }
+
+        if (msg.SessionResumptionUpdate != null)
+        {
+            // Keep the newest handle only; it is what the next reconnect resumes
+            // from. resumable=false means there is nothing to keep yet.
+            if (msg.SessionResumptionUpdate.Resumable && !string.IsNullOrEmpty(msg.SessionResumptionUpdate.NewHandle))
+                _resumptionHandle = msg.SessionResumptionUpdate.NewHandle;
+        }
+
+        if (msg.GoAway != null)
+        {
+            // Not an error: the server is rotating the connection. The close
+            // that follows is reconnected like any other.
+            Log("Server goAway, timeLeft=" + msg.GoAway.TimeLeft);
         }
 
         if (msg.ToolCall?.FunctionCalls != null)

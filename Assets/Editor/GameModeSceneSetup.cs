@@ -2,9 +2,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
-// Builds game mode's two scene objects in Room.unity and wires them up. A menu item
+// Builds game mode's scene object in Room.unity and wires it up. A menu item
 // rather than hand-edited YAML for the reason scene-structure.md gives: the Editor
 // holds the scene in memory and writes it back on save, so an outside edit is lost,
 // and inventing fileIDs by hand risks corrupting it.
@@ -15,14 +14,9 @@ public static class GameModeSceneSetup
 {
     private const string RoomScenePath = "Assets/Scenes/Room.unity";
     private const string ModeObjectName = "--GameMode--";
-    private const string UiObjectName = "--GameUI--";
     private const string GameCameraName = "camera_game";
     private const string ZoomCameraName = "camera_game_zoom";
     private const string TvObjectName = "TV_Set";
-
-    // The vendored game's own canvases top out at 201, so the way out sits well
-    // clear of them. Below that and the back button ends up under the game's HUD.
-    private const int UiSortingOrder = 500;
 
     [MenuItem("Tools/StudyWithMe/Set Up Game Mode")]
     public static void SetUp()
@@ -37,20 +31,16 @@ public static class GameModeSceneSetup
         }
 
         GameModeController mode = FindOrCreateMode();
-        GameModeButton button = FindOrCreateUi();
 
         if (!WireCast(mode)) return;
 
-        button.gameMode = mode;
-
         EditorUtility.SetDirty(mode);
-        EditorUtility.SetDirty(button);
         EditorSceneManager.MarkSceneDirty(scene);
 
-        Debug.Log("[GameModeSetup] " + ModeObjectName + " and " + UiObjectName +
-                  " are in place and wired. Frame the couch pose and the push-in with the " +
-                  "gizmos on " + ModeObjectName + ", drag the two buttons where you want them, " +
-                  "then save the scene.", mode);
+        Debug.Log("[GameModeSetup] " + ModeObjectName + " is in place and wired. Frame the couch " +
+                  "pose and the push-in with the gizmos on " + ModeObjectName + ", then save the " +
+                  "scene. There is no game-mode UI to build any more: the way in and the way out " +
+                  "are both the conversation (D-054).", mode);
     }
 
     private static GameModeController FindOrCreateMode()
@@ -90,12 +80,11 @@ public static class GameModeSceneSetup
         mode.gameCamera = FindCameraNamed(GameCameraName);
         mode.zoomCamera = FindOrCreateZoomCamera();
 
-        // The dance canvas is the thing that has to get out of the way while the game
-        // owns the screen; the game-mode canvas stays, because it carries the way back.
-        DanceModeButton danceUi = Object.FindFirstObjectByType<DanceModeButton>();
-        mode.roomUi = danceUi != null
-            ? new[] { danceUi.gameObject }
-            : new GameObject[0];
+        // roomUi is deliberately NOT written any more. It used to be filled with the
+        // dance canvas, and with the mode buttons gone (D-054) the room has no canvas
+        // left to hide — the only thing on screen during the game is the push-to-talk
+        // harness, which is IMGUI and must stay, since talking is now the way out.
+        // The field is left as authored; SetRoomUiVisible is null-safe either way.
 
         bool ok = true;
         ok &= Require(mode.chloe, "chloe (CharacterPresenter)");
@@ -186,158 +175,4 @@ public static class GameModeSceneSetup
         return false;
     }
 
-    private static GameModeButton FindOrCreateUi()
-    {
-        GameModeButton existing = Object.FindFirstObjectByType<GameModeButton>();
-
-        if (existing != null && existing.startButton != null && existing.backButton != null)
-        {
-            // Re-run on a complete setup: keep the buttons where they were dragged,
-            // only make sure the canvas still outranks the game's.
-            Canvas c = existing.GetComponent<Canvas>();
-            if (c != null) c.sortingOrder = UiSortingOrder;
-            return existing;
-        }
-
-        // Half-built, from a run that threw partway through. Keeping it would be worse
-        // than rebuilding: the object exists, so a re-run would "find" it and skip
-        // creation forever, leaving a canvas with no way out on it.
-        if (existing != null)
-        {
-            Debug.LogWarning("[GameModeSetup] " + UiObjectName + " was incomplete (a previous run " +
-                             "did not finish); rebuilding it.", existing);
-            Undo.DestroyObjectImmediate(existing.gameObject);
-        }
-
-        Font font = ResolveUiFont();
-
-        GameObject root = new GameObject(UiObjectName, typeof(RectTransform));
-        Undo.RegisterCreatedObjectUndo(root, "Create " + UiObjectName);
-
-        Canvas canvas = root.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = UiSortingOrder;
-
-        CanvasScaler scaler = root.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-
-        root.AddComponent<GraphicRaycaster>();
-
-        GameModeButton button = root.AddComponent<GameModeButton>();
-
-        button.startButton = CreateButton(root.transform, "GameModeButton", "Oyun Oyna", font,
-                                          new Vector2(1f, 1f), new Vector2(-24f, -104f), out Text startLabel);
-        button.startLabel = startLabel;
-
-        // Measured against the dance button rather than guessed at: a hardcoded
-        // corner is exactly how the first attempt landed on top of it.
-        StackUnderDanceButton((RectTransform)button.startButton.transform);
-
-        // Bottom-left: the game is portrait and centred, so on any wide screen this
-        // corner is background rather than gameplay.
-        button.backButton = CreateButton(root.transform, "BackToRoomButton", "Odaya dön", font,
-                                         new Vector2(0f, 0f), new Vector2(120f, 44f), out Text _);
-        button.backButton.gameObject.SetActive(false);
-
-        return button;
-    }
-
-    /// <summary>
-    /// Copies the dance button's anchor, pivot and size, then drops one height below
-    /// it. Both are the same kind of thing and now read as a stack rather than two
-    /// buttons that happen to share a corner — and, unlike a hardcoded position, this
-    /// still holds after the dance button is dragged somewhere else.
-    /// </summary>
-    private static void StackUnderDanceButton(RectTransform rect)
-    {
-        DanceModeButton dance = Object.FindFirstObjectByType<DanceModeButton>();
-
-        RectTransform other = dance != null && dance.button != null
-            ? dance.button.transform as RectTransform
-            : null;
-
-        if (other == null)
-        {
-            Debug.LogWarning("[GameModeSetup] no dance button to measure against; the game-mode " +
-                             "button is at a default corner and may need dragging.");
-            return;
-        }
-
-        rect.anchorMin = other.anchorMin;
-        rect.anchorMax = other.anchorMax;
-        rect.pivot = other.pivot;
-        rect.sizeDelta = other.sizeDelta;
-
-        const float gap = 12f;
-        rect.anchoredPosition = other.anchoredPosition - new Vector2(0f, other.sizeDelta.y + gap);
-    }
-
-    /// <summary>
-    /// The dance button's own label font, and only if that fails a built-in one.
-    ///
-    /// Copying what is already working in this scene beats naming a built-in font:
-    /// the built-in name is a moving target (Unity 6 retired Arial.ttf for
-    /// LegacyRuntime.ttf), and fonts come from Resources.GetBuiltinResource — NOT
-    /// AssetDatabase.GetBuiltinExtraResource, which serves a different resource file
-    /// and fails on every font name you hand it. Reusing the existing label also
-    /// keeps the two buttons looking like the same app.
-    /// </summary>
-    private static Font ResolveUiFont()
-    {
-        DanceModeButton dance = Object.FindFirstObjectByType<DanceModeButton>();
-
-        if (dance != null && dance.label != null && dance.label.font != null) return dance.label.font;
-
-        Font builtin = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-
-        if (builtin == null)
-            Debug.LogWarning("[GameModeSetup] no font could be resolved; the buttons will have " +
-                             "labels with no font set. Assign one on their Label objects.");
-
-        return builtin;
-    }
-
-    // Legacy UnityEngine.UI.Text, not TextMeshPro, and deliberately: same call
-    // DanceModeButton made — one line of label text is not worth a TMP dependency,
-    // and swapping it later is an Inspector change.
-    private static Button CreateButton(Transform parent, string name, string label, Font font,
-                                       Vector2 anchor, Vector2 position, out Text text)
-    {
-        GameObject go = new GameObject(name, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-
-        RectTransform rect = (RectTransform)go.transform;
-        rect.anchorMin = anchor;
-        rect.anchorMax = anchor;
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = new Vector2(200f, 56f);
-        rect.anchoredPosition = position;
-
-        go.AddComponent<CanvasRenderer>();
-        Image image = go.AddComponent<Image>();
-        image.color = new Color(0.12f, 0.12f, 0.14f, 0.85f);
-
-        Button button = go.AddComponent<Button>();
-        button.targetGraphic = image;
-
-        GameObject labelGo = new GameObject("Label", typeof(RectTransform));
-        labelGo.transform.SetParent(go.transform, false);
-
-        RectTransform labelRect = (RectTransform)labelGo.transform;
-        labelRect.anchorMin = Vector2.zero;
-        labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = Vector2.zero;
-        labelRect.offsetMax = Vector2.zero;
-
-        labelGo.AddComponent<CanvasRenderer>();
-        text = labelGo.AddComponent<Text>();
-        text.text = label;
-        text.alignment = TextAnchor.MiddleCenter;
-        text.color = Color.white;
-        text.fontSize = 22;
-        text.font = font;
-
-        return button;
-    }
 }

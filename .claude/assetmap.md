@@ -1,4 +1,4 @@
-<!-- stamp: 2026-08-17T13:37Z source-sig:879b1642762e assets:34 prefabs:198 scenes:9 asmdefs:0 -->
+<!-- stamp: 2026-08-18T07:36Z source-sig:28dc3d655a41 assets:35 prefabs:198 scenes:9 asmdefs:0 -->
 # assetmap — asset inventory (data, prefabs, load surface, assemblies)
 
 Regenerate with `python3 .claude/hooks/build_assetmap.py`. `data-source.md`
@@ -11,6 +11,7 @@ the cost model reads the load-surface section before pricing a load.
 
 ## ScriptableObject assets
 
+- Assets/Config/ChloePersona.asset | type: ChloePersonaConfig | script: Assets/Scripts/Config/ChloePersonaConfig.cs
 - Assets/Config/GeminiApiConfig.asset | type: GeminiApiConfig | script: Assets/Scripts/Config/GeminiApiConfig.cs
 - Assets/FruitMerge/Data/FaceSet.asset | type: FaceSet | script: Assets/FruitMerge/Scripts/Data/FaceSet.cs
 - Assets/FruitMerge/Data/FruitDatabase.asset | type: FruitDatabase | script: Assets/FruitMerge/Scripts/Data/FruitDatabase.cs

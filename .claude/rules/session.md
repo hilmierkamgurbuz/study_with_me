@@ -6,9 +6,9 @@ paths:
 
 # Session domain rules
 
-- Session flow code holds no references to UI or Presentation (dependency arrow is one-way: UI/Presentation → Session, never back). States communicate outward only via `SessionFlowStateMachine.StateChanged` and `SessionContext` fields — never by calling into a UI/Presentation type.
-- Only `SessionFlowStateMachine.ChangeState` transitions the current state; a state never sets `_state`/`Current` directly, and nothing outside the machine calls `Enter`/`Exit` directly.
-- Free chat is not a state — it is the ambient default of `SessionActiveState` (push-to-talk always live, no tool restrictions). Do not add a `FreeChatState`; it would either freeze or duplicate the break-timer tick that must keep running underneath free chat.
-- `BreakPlanner` stays a pure, dependency-free function (no Unity/voice/network types) — it is the one thing in this shard worth a unit test via `com.unity.test-framework`.
-- `SessionContext` is the only shared mutable blackboard between states; a state never holds its own copy of data another state also needs (e.g. elapsed minutes, break checkpoints) — that's how the same field gets two writers.
-- Each state's `Enter` declares its own `MicPolicy` and `VoiceSessionConfig` (tools/system-instruction) explicitly — never assume a policy/config carried over from the previous state.
+- Nothing in this shard is a MonoBehaviour and nothing here names a UI, Presentation or Voice type. Both classes are plain C# handed their inputs by Bootstrap; that is what keeps the dependency arrow one-way and lets them be exercised without entering Play mode.
+- **There is no flow state machine, and free chat is not a state.** The conversation is ambient and always available, so there is nothing to transition. D-052 removed the six-state design; reintroducing a state is a decisions.md entry, not a quiet addition.
+- `StudyBlockRunner` is the sole owner of study/break time. No caller keeps its own elapsed counter, and nothing else decides when a block is over.
+- `BreakOfferPolicy` is the sole owner of "how often to offer" and "when to stop asking". The prompt may describe an offer; it never counts one, because a model cannot be relied on to keep score.
+- Study time is spent only by studying. A dance, a game or a live voice turn **freezes** the clock — they are time spent instead of studying, never a shorter version of it.
+- A break is never ended by this shard. `BreakElapsed` is a cue to ask the user, and only a fresh `StartStudy` leaves the break phase — an activity's own length (a two-minute dance, a game of unknown duration) is not this clock's business.

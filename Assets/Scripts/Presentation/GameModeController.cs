@@ -116,6 +116,12 @@ public class GameModeController : MonoBehaviour
     private bool _handingOver;
     private bool _leaveRequested;
 
+    // What the app was oriented as before the game took the screen. Captured
+    // rather than assumed, so restoring works whether the build ships fixed
+    // landscape or auto-rotation.
+    private ScreenOrientation _roomOrientation;
+    private bool _orientationChanged;
+
     // How far into the push-in the camera currently is. The unwind reads it rather
     // than assuming 1: leaving during the three-second wait is normal, and unwinding
     // from 1 would snap the camera onto the TV before pulling it back out.
@@ -363,6 +369,15 @@ public class GameModeController : MonoBehaviour
             yield break;
         }
 
+        // Turn the device portrait BEFORE the viewport is computed. The game is
+        // authored 1080x1920 and the app ships landscape, so on a phone it would
+        // otherwise play in a narrow centre strip with most of the screen given to
+        // letterbox bars. Rotating hands it the whole screen instead, and the
+        // viewport maths below then has almost nothing left to correct. Ignored on
+        // desktop, where Screen.orientation does nothing — so the Editor behaves
+        // exactly as it did before.
+        EnterPlayOrientation();
+
         PrepareLoadedGame();
 
         // Makes the game's own lighting/render settings the live ones, and sends
@@ -382,6 +397,31 @@ public class GameModeController : MonoBehaviour
 
         _leaveRequested = false;
         StartCoroutine(ReturnToRoom());
+    }
+
+    /// <summary>
+    /// Gives a portrait game the whole screen instead of a strip between two
+    /// letterbox bars. Guarded on playResolution actually being portrait, so it
+    /// stays correct if that field is ever changed, and on desktop it costs
+    /// nothing — Screen.orientation is not honoured there.
+    /// </summary>
+    private void EnterPlayOrientation()
+    {
+        if (_orientationChanged) return;
+        if (playResolution.x <= 0f || playResolution.y <= 0f) return;
+        if (playResolution.x >= playResolution.y) return;
+
+        _roomOrientation = Screen.orientation;
+        _orientationChanged = true;
+        Screen.orientation = ScreenOrientation.Portrait;
+    }
+
+    private void ExitPlayOrientation()
+    {
+        if (!_orientationChanged) return;
+
+        _orientationChanged = false;
+        Screen.orientation = _roomOrientation;
     }
 
     private void PrepareLoadedGame()
@@ -580,6 +620,12 @@ public class GameModeController : MonoBehaviour
             SceneManager.SetActiveScene(gameObject.scene);
             yield return SceneManager.UnloadSceneAsync(_gameScene);
         }
+
+        // Back to how the app was oriented before the game took the screen. Done
+        // on every exit path, because this coroutine is the single funnel all of
+        // them pass through — including the one taken before the handover ever
+        // happened, where the orientation was never changed and this is a no-op.
+        ExitPlayOrientation();
 
         // The game pauses by zeroing it, and leaving from its pause screen is normal.
         Time.timeScale = 1f;

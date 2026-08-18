@@ -5,9 +5,9 @@
 - Config — holds the Gemini API key + model id (ScriptableObject, gitignored asset) — depends on: —
 - Voice — Gemini Live WebSocket transport: connect/setup handshake, mic capture, activity signaling, streaming playback, tool-call dispatch, barge-in — depends on: Config
 - Persistence — student profile schema, local JSON repository, merge-on-write, end-of-session summarization (one-shot REST call) — depends on: Config
-- Session — flow state machine (six states), break planning, structured-decision tool wiring — depends on: Voice, Persistence
-- Presentation — character reactions, camera rig (default/TV-focus lerp), rewarded-ad stub, ambient pet roaming (cat/dog waypoint routes), dance mode (timed camera/light/music/disco sequence; `DanceModeController`), game mode (timed couch/camera/push-in sequence that hands the screen to the vendored minigame; `GameModeController`), the desk book turning its own pages (`BookPageTurner`), and what she does at the desk between conversations — study mode — turning to the book to read, page by page (`DeskRoutine`, which is what decides when a page turns; started by a button for now, by the conversation later), and two-bone arm IK putting her hands and wrists on authored targets rather than wherever a clip left them (`ArmIkSolver`) — the last three depend on nothing upstream, they are ambience rather than session-driven. Dance and game mode are mutually exclusive and the check is one-way: game mode holds a read-only reference to dance mode and refuses to start while one runs — depends on: Session, Voice, FruitMerge
-- UI — captions, push-to-talk button, text input, break-offer prompt, HUD, ad-stub panel — depends on: Session, Voice
+- Session — the study/break clock (`StudyBlockRunner`) and the break-offer policy (`BreakOfferPolicy`): two plain classes, no MonoBehaviour and no Unity types. **Not** the six-state machine this plan originally drew (D-052): the conversation is ambient and always free, so there is no flow state to transition — what a session has is a clock and a rule about when to offer an activity. Both are handed their inputs by Bootstrap, which is what keeps this system from having to look at Presentation to learn whether a dance is running — depends on: —
+- Presentation — character reactions, camera rig (default/TV-focus lerp), rewarded-ad stub, ambient pet roaming (cat/dog waypoint routes), dance mode (timed camera/light/music/disco sequence; `DanceModeController`), game mode (timed couch/camera/push-in sequence that hands the screen to the vendored minigame; `GameModeController`), the desk book turning its own pages (`BookPageTurner`), and what she does at the desk between conversations — study mode — turning to the book to read, page by page (`DeskRoutine`, which is what decides when a page turns). All three modes are started AND ended BY THE CONVERSATION: `RoomSessionController` calls `StartDance()` / `StartGameMode()` / `StartStudying()` and `StopDance()` / `StopGameMode()` / `StopStudying()` off Gemini tool calls (D-052, D-054). The three on-screen mode buttons were deleted; the app's only button is push-to-talk. `GameModeController`'s own Esc handler remains as the keyboard fallback out of the minigame, and two-bone arm IK putting her hands and wrists on authored targets rather than wherever a clip left them (`ArmIkSolver`) — the last three depend on nothing upstream, they are ambience rather than session-driven. Dance and game mode are mutually exclusive and the check is one-way: game mode holds a read-only reference to dance mode and refuses to start while one runs. That refusal stays read-only on purpose — when the conversation asks for a game mid-dance, **Bootstrap** stops the dance and queues the game (D-058), so nothing but `DanceModeController` and its caller ever writes dance's flow — depends on: Session, Voice, FruitMerge
+- UI — the app's on-screen surface. Today that is exactly one thing: the microphone button (`PushToTalkButtonView`), which is also the connect button and the way out of any mode (D-054, D-056). Captions, text input, break-offer prompt, HUD and the ad-stub panel are still unbuilt. The one component that exists depends on **nothing** — it reports a press and paints a state, and Bootstrap decides what a press means; a view that decided for itself would need a second copy of the session state `RoomSessionController` already holds — depends on: —
 - Bootstrap — composition root; the only place concrete cross-system objects are constructed and wired — depends on: Voice, Persistence, Session, Presentation, UI, Config
 - Tooling — unity-dev skill's own dev-infrastructure editor scripts (e.g. `UnityMapExporter.cs`) and per-milestone scene/test-harness setup scripts (e.g. `VoiceHarnessSceneSetup.cs`); editor-only, never ships in a build — depends on: —
 - FruitMerge — the merge-puzzle minigame the user plays in game mode: a complete game vendored in from a separate Unity project (`Assets/FruitMerge/`), carrying its own scene, `.asset` data, art, audio, UI and editor tools. Imported as-is and **not** wrapped: nothing in it knows this app exists, and no host system reaches inside it — the only seam is "load its scene, hand it the screen". Its own internals (state machine, event bus, pools) are mapped in `codemap-fruitmerge.md` — depends on: —
@@ -41,7 +41,7 @@ All arrows are one-directional (Config and FruitMerge are pure leaves; Bootstrap
 
 - Current reality in `Room.unity` (hand-built by the user, not script-generated): `Directional Light` and `Main Camera` sit at the scene root; room dressing is a mix of ungrouped root-level objects and a few informal named groups (`wall`, `ground`, `gardrop`, `books`) the user created while building. Not the originally-planned `--Systems--`/`--World--`/`--UI--` split — that was aspirational for code-driven content, and doesn't fit hand-placed dressing well. Documented as-is rather than forcing a re-organization with no functional benefit.
 - When Bootstrap/Session/Voice runtime objects land (M5+), add a `--Systems--` root for them specifically — non-visual manager objects benefit from being easy to find, unlike room dressing.
-- The `--Name--` roots are the established shape for a non-visual mode: `--DanceMode--`/`--DanceUI--`, and alongside them `--GameMode--`/`--GameUI--` (built by `Tools > StudyWithMe > Set Up Game Mode`). The controller and its canvas stay separate objects because the canvas is what game mode has to hide while the minigame owns the screen — and `--GameUI--` is the one canvas that must NOT hide, since it carries the way back.
+- The `--Name--` roots are the established shape for a non-visual mode: `--DanceMode--` and `--GameMode--` (the latter built by `Tools > StudyWithMe > Set Up Game Mode`). Their canvases, `--DanceUI--` and `--GameUI--`, are **gone** (D-054): the mode buttons they carried were replaced by the conversation. The app's only button now lives on `--SessionUI--` (D-056), a Screen Space Overlay canvas built by `Tools > StudyWithMe > Set Up Session UI`. **`--SessionUI--` must never be added to `GameModeController.roomUi`** — it is the way out of a mode, so hiding it during one would trap the user; `roomUi` is left unwritten for exactly that reason.
 - **Room objects live on the `Room` layer at runtime.** `GameModeController.Start()` moves everything on the default layer there once, so the minigame's camera can cull the room away on ultrawide screens. Nothing needs to be authored on that layer by hand, and the room's own cameras cull nothing — but it does mean a layer-mask raycast written against room geometry has to expect `Room`, not `Default`.
 - Naming: PascalCase for anything code creates or references by name; the user's own room-dressing group names stay as authored.
 - **Agent-parent pattern for animated movers** (`Cat`, `Dog` in `Room.unity`): an empty parent at scale 1 carries the mover component and the world placement, and the vendor model sits under it pinned to local zero. Required, not stylistic — the PolyOne clips write the animated object's own position/rotation every frame, so movement code and the Animator must own different transforms or they are two writers on one value. Any future animated mover built from a vendor model with baked root curves gets the same shape.
@@ -57,25 +57,31 @@ All arrows are one-directional (Config and FruitMerge are pure leaves; Bootstrap
 
 ```
 Assets/
-  Scripts/Config/          ← .cs: GeminiApiConfig (ScriptableObject definition)      (codemap: core)
+  Scripts/Config/          ← .cs: GeminiApiConfig, ChloePersonaConfig (ScriptableObject
+                               definitions)                                          (codemap: core)
   Scripts/Voice/           ← .cs: IVoiceSession, GeminiLiveVoiceSession, StreamingAudioPlayer,
                                GeminiLiveMessages DTOs, VoiceSessionConfig, MicPolicy, TurnState,
                                CaptionEvent, ToolCallEvent                            (codemap: voice)
-  Scripts/Session/         ← .cs: ISessionState, SessionContext, SessionFlowStateMachine,
-                               SessionFlowRunner, ISessionActions, BreakPlanner,
-                               Session/States/*.cs                                   (codemap: session)
+  Scripts/Session/         ← .cs: StudyBlockRunner, BreakOfferPolicy. The States/ subfolder
+                               is left over from the six-state plan D-052 superseded and is
+                               empty; it is kept only because deleting it is an Editor
+                               action, not a code one                                (codemap: session)
   Scripts/Presentation/    ← .cs: PresentationCoordinator, CharacterPresenter, RewardedAdStub,
                                (a camera-rig approach TBD — first attempt reverted, D-007)  (codemap: presentation)
   Scripts/Persistence/     ← .cs: StudentProfile, IProfileRepository,
                                LocalJsonProfileRepository, ProfileMerger,
                                TranscriptRecorder, GeminiSessionSummarizer           (codemap: persistence)
-  Scripts/UI/              ← .cs: CaptionPanelView, PushToTalkButtonView, TextInputView,
+  Scripts/UI/              ← .cs: PushToTalkButtonView (the only one built). Planned, not yet
+                               written: CaptionPanelView, TextInputView,
                                BreakOfferPromptView, SessionHudView                  (codemap: ui)
   Scripts/Bootstrap/       ← .cs: GameBootstrapper (composition root)                (codemap: core)
   Editor/                  ← UnityMapExporter.cs, VoiceHarnessSceneSetup.cs,
                                ChloeUsedRegionExporter.cs, ChloeClipPathFixer.cs, and future
                                per-milestone scene-setup scripts                     (codemap: editor/tooling)
-  Config/                  ← GeminiApiConfig.asset (gitignored, holds the real key)  (assetmap)
+  Config/                  ← GeminiApiConfig.asset (gitignored, holds the real key) and
+                               ChloePersona.asset (TRACKED — .gitignore names the key asset
+                               specifically, not this folder, and persona wording is content
+                               the repo should carry)                                (assetmap)
   Art/Character/           ← imported character model (.fbx etc.), pre-rig          (assetmap)
   Art/Textures/            ← room and character texture art, not just the character's: the 4x4
                                face-expression atlas, the book page images (book_page.png,

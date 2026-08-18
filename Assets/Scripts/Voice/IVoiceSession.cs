@@ -5,6 +5,13 @@ using System.Threading.Tasks;
 public interface IVoiceSession
 {
     Task Connect(VoiceSessionConfig sessionConfig);
+
+    /// <summary>
+    /// Deliberate shutdown. A socket that drops on its own is reconnected
+    /// automatically; this is how the caller says not to.
+    /// </summary>
+    void Disconnect();
+
     void SetMicPolicy(MicPolicy policy);
     void BeginPushToTalk();
     void EndPushToTalk();
@@ -36,6 +43,13 @@ public class VoiceSessionConfig
 {
     public string SystemInstruction;
     public List<VoiceToolDeclaration> Tools = new List<VoiceToolDeclaration>();
+
+    /// <summary>
+    /// Ceiling on the exponential backoff between reconnect attempts, in
+    /// seconds. Supplied by the caller so the transport reads no config asset
+    /// of its own.
+    /// </summary>
+    public float ReconnectBackoffMaxSeconds;
 }
 
 public class VoiceToolDeclaration
