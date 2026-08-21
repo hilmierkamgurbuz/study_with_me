@@ -1,4 +1,4 @@
-<!-- stamp: 340fb36 2026-08-18 status: OK -->
+<!-- stamp: 0b11c11 2026-08-21 status: OK -->
 Assets/FruitMerge/Editor/AndroidVibratePermission.cs | adds VIBRATE permission to the Android manifest | sys: FruitMerge | api: OnPostGenerateGradleAndroidProject(string path) | dep: - | used: - | crit: K3 | note: - | h:88b61d18
 Assets/FruitMerge/Editor/ConfettiTestMenu.cs | play-mode menu that fires confetti | sys: FruitMerge | api: - | dep: ConfettiDirector | used: - | crit: K3 | note: - | h:cb57cfaf
 Assets/FruitMerge/Editor/SaveResetMenu.cs | menu to reset or inspect the save file | sys: FruitMerge | api: - | dep: - | used: - | crit: K3 | note: - | h:368e84ec

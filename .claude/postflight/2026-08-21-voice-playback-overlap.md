@@ -1,0 +1,16 @@
+# Postflight: Oturum başında üst üste binen ses
+
+- [Y] No procedure violations — `locate.md` adım 3'te durdu (Voice/`codemap-voice.md`); `recompute-timing.md`'in sonucu koda geçti: barge-in penceresi olay güdümlü, süre sınırı `Update` yerine sesin okunduğu tek yerde (`DiscardingInterruptedAudio`) sınanıyor, yani kare başına maliyet sıfır.
+- [Y] Located, not scanned — index → codemap-voice → dosya. Repo geneli grep yok; alt ajan kullanılmadı. Tek geniş arama `Assets/Scripts` içinde "başka AudioSource var mı" sorusuydu ve o da codemap iki dosyayı işaret ettikten sonra, o kapsamda yapıldı.
+- [Y] Invariant scan clean — C# yalnızca Edit/Write ile yazıldı; UI/Presentation'a sızan bir bağımlılık yok (değişiklik `GeminiLiveVoiceSession` içinde kaldı, `IVoiceSession` yüzeyi aynı); `toolCall` hâlâ aynı geçişte `toolResponse` alıyor (dokunulmadı); sayı ve metin hâlâ koda gömülü değil — `RingBufferSeconds`/`BargeInDropSeconds` içerik değil tampon ölçüsü; `Assets/FruitMerge/` dokunulmadı.
+- [Y] Proof standard met — frekansa duyarlı iki karar hesaplandı. (1) Barge-in penceresi: her karede geri sayım (×60) yerine ses geldiğinde sınama (olay, ×1) — okuma yeri zaten tek, oran ≥10× ve iş kare frekansında olduğu için ucuz olan seçildi. (2) Halka: DSP callback'i O(data.Length), değişmedi; taşma dalı callback'e değil üretici tarafa eklendi, tahsis yok. Bellek 0.77 MB → 2.9 MB, tek seferlik, kare bütçesiyle ilgisiz.
+- [Y] Codemap updated — `codemap-voice.md`'de `GeminiLiveVoiceSession.cs` satırının `note`'u yeniden yazıldı, `api`/`dep`/`used` değişmedi (yeni üyelerin hepsi private). `build_codemap.py` → `OK; stamp updated`, marker bırakılmadı.
+- [Y] decisions.md updated — D-059 (barge-in'in ikinci yarısı + halka taşma politikası + `interrupted`'ın önce işlenmesi), D-060 (tek canlı socket), ikisi de `affects:` ile.
+- [N] Assumptions closed — üçü de OPEN kalıyor, çünkü hiçbiri bu makinede doğrulanamaz: (a) sunucunun kesilen turun kuyruğunu göndermeye devam ettiği, (b) `serverContent.interrupted`'ın barge-in'de gerçekten geldiği, (c) halkanın cihazda gerçekten taştığı. Üçü de logcat'te kendini gösterecek şekilde yazıldı ("Barge-in: discarding...", "Model turn interrupted (server ack).", "Playback buffer full (30s): dropped N samples."). Yapılacak: kullanıcı bir oturum açıp `adb logcat -s Unity` çıktısını verdiğinde üçü de kapanır; taşma satırı hiç görünmezse `RingBufferSeconds` 30 fazla demektir ve geri inebilir.
+- [Y] Editor side synced — bu görevin editör tarafı yok: sahne, prefab, asset değişmedi. `unitymap.md` yalnız Stop hook'unun damgasıyla güncellendi.
+- [Y] Blueprint consistent — `python3 .claude/hooks/check_blueprint.py` → `[blueprint] 0 error(s), 1 warning(s), 2 info.` (STALE satırı onarıldıktan sonraki koşu; onarımdan önce 2 uyarı vardı.) Kalan tek uyarı bu görevden önce de vardı ve yoluna değmiyor: blueprint'te yazmayan `Assets/deneme material/` klasörü.
+- [Y] Shipping signals checked — bu bir hata düzeltmesi; sürüm kapsamı içerik olarak tamamlanmış değil, faz geçişi önerilmedi.
+
+## Derleme
+
+`dotnet build Assembly-CSharp.csproj` → **0 Hata**, 6 uyarı (hepsi önceden var olan System.Net.Http / System.IO.Compression sürüm çakışmaları, bu değişiklikle ilgisiz).

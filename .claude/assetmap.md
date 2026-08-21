@@ -1,4 +1,4 @@
-<!-- stamp: 2026-08-18T07:36Z source-sig:28dc3d655a41 assets:35 prefabs:198 scenes:9 asmdefs:0 -->
+<!-- stamp: 2026-08-21T08:27Z source-sig:201d812e6b26 assets:35 prefabs:198 scenes:9 asmdefs:0 -->
 # assetmap — asset inventory (data, prefabs, load surface, assemblies)
 
 Regenerate with `python3 .claude/hooks/build_assetmap.py`. `data-source.md`

@@ -14,7 +14,17 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
 
     private const int InputSampleRate = 16000;
     private const int OutputSampleRate = 24000;
-    private const int RingBufferSeconds = 8;
+
+    // The server delivers a turn's audio faster than it is spoken, so this is
+    // sized for a whole turn arriving at once rather than for the ~1s of
+    // jitter a real-time stream would need. 30s of 24kHz mono floats is 2.9MB.
+    private const int RingBufferSeconds = 30;
+
+    // How long a barge-in keeps discarding incoming audio when the server is
+    // still generating the turn that was interrupted. The window normally ends
+    // the moment the server acknowledges with serverContent.interrupted; this
+    // is only the bound for the case where that acknowledgement never comes.
+    private const float BargeInDropSeconds = 1f;
 
     public GeminiApiConfig config;
 
@@ -65,6 +75,15 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
     private int _ringRead;
     private int _ringFilled;
 
+    // Barge-in state. Flushing the ring only disposes of audio that has already
+    // arrived; the server keeps sending the cancelled turn until it processes
+    // the interruption, and that tail would otherwise be played over the answer
+    // to what was just said. _serverTurnGenerating says whether there is such a
+    // tail to expect at all — without it, a press made while she is silent
+    // would throw away the beginning of her next answer.
+    private bool _serverTurnGenerating;
+    private float _dropIncomingAudioUntil = -1f;
+
     private readonly Queue<string> _sendQueue = new Queue<string>();
     private bool _sending;
 
@@ -84,8 +103,11 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
 #if !UNITY_WEBGL || UNITY_EDITOR
         _ws?.DispatchMessageQueue();
 #endif
-        // The socket's close callback can land off the main thread, so it only
-        // raises a flag and everything that touches Unity happens here.
+        // The socket's close callbacks raise a flag and nothing else, and a
+        // close is handled here, once. The installed package happens to post its
+        // callbacks to Unity's SynchronizationContext, so they already arrive on
+        // the main thread — but that is the package's choice, not a promise, and
+        // one owner of "the connection is gone" is worth the flag either way.
         if (_closedSignal && !_closedHandled)
         {
             _closedHandled = true;
@@ -133,37 +155,68 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
         _intentionalClose = true;
         _reconnectAt = -1f;
         if (_isListening) EndPushToTalk();
-        _ws?.Close();
+        CloseSocket(_ws);
     }
 
+    /// <summary>
+    /// Opens the next socket, and makes sure it is the ONLY one talking to us.
+    /// Both halves of that matter: the package posts its callbacks straight to
+    /// Unity's SynchronizationContext, so a socket nobody polls any more still
+    /// delivers messages — an abandoned one goes on pouring a second voice into
+    /// the same playback ring, and its late OnClose would be read as the CURRENT
+    /// connection dropping and start a reconnect that nothing asked for.
+    /// </summary>
     private async Task OpenSocket()
     {
+        CloseSocket(_ws);
+
         _closedSignal = false;
         _closedHandled = false;
         _sendQueue.Clear();
         _sending = false;
 
-        _ws = new WebSocket(_url);
+        // Captured so every callback can check whether it still speaks for the
+        // connection this class considers current, and say nothing if it does not.
+        var socket = new WebSocket(_url);
+        _ws = socket;
 
-        _ws.OnOpen += () =>
+        socket.OnOpen += () =>
         {
+            if (socket != _ws) return;
             Log("WebSocket open, sending setup...");
             SendSetup();
         };
-        _ws.OnError += e =>
+        socket.OnError += e =>
         {
+            if (socket != _ws) return;
             Log("WebSocket error: " + e);
             Faulted?.Invoke(new Exception("WebSocket error: " + e));
             _closedSignal = true;
         };
-        _ws.OnClose += e =>
+        socket.OnClose += e =>
         {
+            if (socket != _ws) return;
             Log("WebSocket closed: " + e);
             _closedSignal = true;
         };
-        _ws.OnMessage += HandleMessage;
+        socket.OnMessage += bytes =>
+        {
+            if (socket != _ws) return;
+            HandleMessage(bytes);
+        };
 
-        await _ws.Connect();
+        await socket.Connect();
+    }
+
+    /// <summary>
+    /// Closing is not enough on its own: a socket still opening ignores Close()
+    /// (it is not Open yet), and only cancelling its token stops it.
+    /// </summary>
+    private static void CloseSocket(WebSocket socket)
+    {
+        if (socket == null) return;
+        if (socket.State == WebSocketState.Open) _ = socket.Close();
+        else socket.CancelConnection();
     }
 
     /// <summary>
@@ -175,6 +228,12 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
     private void HandleSocketClosed()
     {
         _setupComplete = false;
+
+        // Nothing more can arrive on a socket that is gone, so a barge-in has
+        // nothing left to wait for. What is already buffered is still hers and
+        // is left to play out — a rotated connection is meant to be inaudible.
+        _serverTurnGenerating = false;
+        _dropIncomingAudioUntil = -1f;
 
         if (_isListening)
         {
@@ -211,7 +270,7 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
         }
         if (_isListening) return;
 
-        FlushPlayback();
+        BeginBargeIn();
 
         _micDevice = null;
         _micClip = Microphone.Start(_micDevice, true, 1, InputSampleRate);
@@ -236,7 +295,7 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
     {
         if (_ws == null || _ws.State != WebSocketState.Open) return;
 
-        FlushPlayback();
+        BeginBargeIn();
 
         var msg = new GeminiClientContentMessage
         {
@@ -406,6 +465,21 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
 
     private void HandleServerContent(GeminiServerContent content)
     {
+        // Read before the audio in the same message, never after: everything
+        // buffered belongs to an answer the server has just abandoned, and
+        // flushing afterwards would discard its replacement instead.
+        if (content.Interrupted)
+        {
+            Log("Model turn interrupted (server ack).");
+            _serverTurnGenerating = false;
+            _dropIncomingAudioUntil = -1f;
+            FlushPlayback();
+            // An abandoned turn never gets its turnComplete, so nothing else
+            // would move her out of Speaking. Listening is left alone: a
+            // push-to-talk barge-in has already said what the state is.
+            if (_turnState == TurnState.Speaking) SetTurnState(TurnState.Idle);
+        }
+
         if (content.InputTranscription != null && !string.IsNullOrEmpty(content.InputTranscription.Text))
             CaptionReceived?.Invoke(new CaptionEvent(true, content.InputTranscription.Text));
 
@@ -414,27 +488,30 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
 
         if (content.ModelTurn?.Parts != null)
         {
-            bool hasContent = false;
+            bool discard = DiscardingInterruptedAudio();
+            bool hasAudio = false;
             foreach (var part in content.ModelTurn.Parts)
             {
-                if (part.InlineData != null && !string.IsNullOrEmpty(part.InlineData.Data))
-                {
-                    byte[] pcm = Convert.FromBase64String(part.InlineData.Data);
-                    EnqueuePlayback(pcm);
-                    hasContent = true;
-                }
+                if (part.InlineData == null || string.IsNullOrEmpty(part.InlineData.Data)) continue;
+                hasAudio = true;
+                if (discard) continue;
+                EnqueuePlayback(Convert.FromBase64String(part.InlineData.Data));
             }
-            if (hasContent) SetTurnState(TurnState.Speaking);
+            if (hasAudio)
+            {
+                // True whether the audio was kept or dropped — either way the
+                // server has a turn in hand, which is what the next barge-in
+                // needs to know.
+                _serverTurnGenerating = true;
+                if (!discard) SetTurnState(TurnState.Speaking);
+            }
         }
 
         if (content.TurnComplete)
         {
+            _serverTurnGenerating = false;
+            _dropIncomingAudioUntil = -1f;
             SetTurnState(TurnState.Idle);
-        }
-
-        if (content.Interrupted)
-        {
-            Log("Model turn interrupted (server ack).");
         }
     }
 
@@ -445,20 +522,66 @@ public class GeminiLiveVoiceSession : MonoBehaviour, IVoiceSession
         TurnStateChanged?.Invoke(state);
     }
 
+    /// <summary>
+    /// A full ring drops what has just arrived and keeps what is already
+    /// playing. The other way round — advancing the read cursor to make room —
+    /// leaves the two cursors adjacent, so every DSP block lands somewhere else
+    /// in the utterance and a sentence is heard shredded into another one.
+    /// Losing the tail of a turn this long is audible too, hence the warning:
+    /// if it ever appears, the buffer is the number to revisit.
+    /// </summary>
     private void EnqueuePlayback(byte[] pcm16)
     {
         int sampleCount = pcm16.Length / 2;
+        int dropped = 0;
+
         lock (_ringLock)
         {
             for (int i = 0; i < sampleCount; i++)
             {
+                if (_ringFilled >= _ringBuffer.Length)
+                {
+                    dropped = sampleCount - i;
+                    break;
+                }
                 short s = (short)(pcm16[i * 2] | (pcm16[i * 2 + 1] << 8));
                 _ringBuffer[_ringWrite] = s / 32768f;
                 _ringWrite = (_ringWrite + 1) % _ringBuffer.Length;
-                if (_ringFilled < _ringBuffer.Length) _ringFilled++;
-                else _ringRead = (_ringRead + 1) % _ringBuffer.Length;
+                _ringFilled++;
             }
         }
+
+        if (dropped > 0)
+            Log("Playback buffer full (" + RingBufferSeconds + "s): dropped " + dropped + " samples.");
+    }
+
+    /// <summary>
+    /// What a press of the button, or a line of text, does to audio that is
+    /// already on its way. The flush is synchronous — barge-in never waits on a
+    /// round trip — and the drop window covers the gap between that flush and
+    /// the server hearing about the interruption.
+    /// </summary>
+    private void BeginBargeIn()
+    {
+        FlushPlayback();
+
+        if (!_serverTurnGenerating) return;
+        _dropIncomingAudioUntil = Time.unscaledTime + BargeInDropSeconds;
+        Log("Barge-in: discarding the interrupted turn's audio until the server acks.");
+    }
+
+    /// <summary>
+    /// True while a barge-in is still waiting for the server to stop sending the
+    /// turn it was asked to abandon. Decided here, at the one place that reads
+    /// it, rather than counted down in Update: a frame that receives no audio
+    /// has nothing to decide.
+    /// </summary>
+    private bool DiscardingInterruptedAudio()
+    {
+        if (_dropIncomingAudioUntil < 0f) return false;
+        if (Time.unscaledTime < _dropIncomingAudioUntil) return true;
+        _dropIncomingAudioUntil = -1f;
+        return false;
     }
 
     private void ReadPlaybackSamples(float[] data)
